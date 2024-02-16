@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Polygon Display</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.css" type="text/css">
+    <style>
+      .map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script src="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.js"></script>
+    <script type="text/javascript">
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([17.644, 45.554]), 
+          zoom: 7
+        })
+      });
+
+      var polygonData = {{ polygon_data | tojson | safe }};
+
+      var polygonFeature = new ol.Feature({
+        geometry: new ol.geom.Polygon([polygonData.polygon]).transform('EPSG:4326', 'EPSG:3857')
+      });
+
+      var vectorSource = new ol.source.Vector({
+        features: [polygonFeature]
+      });
+
+      var vectorLayer = new ol.layer.Vector({
+        source: vectorSource
+      });
+
+      map.addLayer(vectorLayer);
+      map.getView().fit(vectorSource.getExtent(), {padding: [100, 100, 100, 100]});
+      </script>
+      
+  </body>
+</html>
